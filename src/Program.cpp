@@ -25,9 +25,13 @@ Program::Program() {
             new StdEnemy(x, y)
         });
     }
+    bgm=LoadMusicStream("audio/TheWorldRevolving.mp3");
+    PlayMusicStream(bgm);
+    SetMusicVolume(bgm,0.5f);
 }
 
 void Program::Update() {
+    UpdateMusicStream(bgm);
     for (Animation& a : Animation::animations) a.update();
     for (int i = 0; i < Animation::animations.size(); i++) {
         if (Animation::animations[i].done) Animation::animations.erase(Animation::animations.begin() + i);
