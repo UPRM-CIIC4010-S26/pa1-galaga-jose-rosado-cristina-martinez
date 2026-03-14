@@ -21,4 +21,4 @@ You MUST put you & your partner's information in this README file otherwise ther
 If a partner has no commits in the repositories, they will receive a 0.
 
 ## Student Notes
-If you have any bonus specs, bonus or any details the TA's should know, you should include it here: The bonus I added was so that the spaceship could move up and down.
+If you have any bonus specs, bonus or any details the TA's should know, you should include it here: The bonus I added was so that the spaceship could move up and down and I added background music.
