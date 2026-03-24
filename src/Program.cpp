@@ -6,36 +6,31 @@ Program::Program() {
         HitBox(GetScreenWidth() - 10, 0, 10, GetScreenHeight())
     };
 
-    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
-            std::pair<float, float>{350, 150}, 
-            new SpEnemy(350, 150)
-        });
-
-    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
-            std::pair<float, float>{600, 150}, 
-            new SpEnemy(600, 150)
-        });
+    Enemy::enemies.push_back({ {350, 150}, new SpEnemy(350, 150) });
+    Enemy::enemies.push_back({ {600, 150}, new SpEnemy(600, 150) });
 
     for (int i = 0; i < 30; i++) {
-        float x = 250 + 50 *(i%10) ;    //This line was done by Jose Rosado
-        float y = 200 + 50 * (i/10);    //This line was done by Jose Rosado
-
-        Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
-            std::pair<float, float>{x, y}, 
-            new StdEnemy(x, y)
-        });
+        float x = 250 + 50 *(i%10);
+        float y = 200 + 50 * (i/10);
+        Enemy::enemies.push_back({ {x, y}, new StdEnemy(x, y) });
     }
-    bgm=LoadMusicStream("audio/TheWorldRevolving.mp3");
+
+    bgm = LoadMusicStream("audio/TheWorldRevolving.mp3");
     PlayMusicStream(bgm);
-    SetMusicVolume(bgm,0.5f);
+    SetMusicVolume(bgm, 0.5f);
 }
 
 void Program::Update() {
     UpdateMusicStream(bgm);
+
     for (Animation& a : Animation::animations) a.update();
-    for (int i = 0; i < Animation::animations.size(); i++) {
-        if (Animation::animations[i].done) Animation::animations.erase(Animation::animations.begin() + i);
+
+    for (int i = Animation::animations.size() - 1; i >= 0; i--) {
+        if (Animation::animations[i].done) {
+            Animation::animations.erase(Animation::animations.begin() + i);
+        }
     }
+
     pauseFrames = std::max(pauseFrames - 1, 0);
 
     if (!startup && !paused && !gameOver && pauseFrames <= 0) {
@@ -44,7 +39,14 @@ void Program::Update() {
         ManageEnemyRespawns();
         player->update();
 
-        for (std::pair<std::pair<float, float>, Enemy*> p : Enemy::enemies) {
+        for (auto &p : Enemy::enemies) {
+            if (p.second && p.second->health <= 0) {
+                delete p.second;
+                p.second = nullptr;
+            }
+        }
+
+        for (auto &p : Enemy::enemies) {
             if (p.second && HitBox::Collision(player->hitBox, p.second->hitBox)) {
                 Animation::animations.push_back(
                     Animation(player->position.first, player->position.second, 16, 0, 33, 34, 30 ,30, 3, ImageManager::SpriteSheet)
@@ -61,13 +63,13 @@ void Program::Update() {
 
         for (Projectile& p : Projectile::projectiles) { 
             p.update(); 
-            if(p.ID !=0 && HitBox::Collision(player->hitBox,p.getHitBox())){    //This line was done by Jose Rosado
-                PlayerReset();  //This line was done by Jose Rosado
+            if(p.ID != 0 && HitBox::Collision(player->hitBox, p.getHitBox())){
+                PlayerReset();
             }
-
         }
 
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
+
         Projectile::CleanProjectiles();
         Projectile::ProjectileCollision();
     }
@@ -75,18 +77,22 @@ void Program::Update() {
 
 void Program::Draw() {
     background.Draw();
+
     if (pauseFrames <= 0 && !gameOver) player->draw();
+
     for (Animation& a : Animation::animations) a.draw();
 
     for (int i = 0; i < lives; i++) {
-         DrawTexturePro(ImageManager::SpriteSheet, Rectangle{0, 0, 17, 18}, 
-                   Rectangle{10.0f + i * 30, GetScreenHeight() - 30.0f, 20, 20}, 
-                   Vector2{0, 0}, 0, WHITE);
+        DrawTexturePro(ImageManager::SpriteSheet,
+            Rectangle{0, 0, 17, 18},
+            Rectangle{10.0f + i * 30, GetScreenHeight() - 30.0f, 20, 20},
+            Vector2{0, 0}, 0, WHITE);
     }
 
+    for (Projectile& p : Projectile::projectiles) p.draw();
 
-    for (Projectile p : Projectile::projectiles) p.draw();
-    for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) if (p.second) p.second->draw();
+    for (auto &p : Enemy::enemies)
+        if (p.second) p.second->draw();
 
     if (startup) DrawStartup();
     if (paused) DrawPauseScreen();
@@ -99,20 +105,22 @@ void Program::ManageEnemyRespawns() {
     respawnCooldown -= 1;
     if (respawnCooldown <= 0) {
         respawnCooldown = 1080;
-        for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
+
+        for (auto &p : Enemy::enemies) {
             if (!p.second && p.first.second != 150) {
                 int eType = GetRandomValue(1, 3);
 
                 if (eType == 1) {
                     p.second = new StEnemy(GetScreenWidth() / 2 - 15, 0, true);
-                    respawnCooldown /= 2;
+                    respawnCooldown = std::max(respawnCooldown / 2, 60);
                 } else {
                     p.second = new StdEnemy(GetScreenWidth() / 2 - 15, 0, true);
                 }
 
                 respawns++;
                 break;
-            } else if (!p.second && p.first.second == 150) {
+            }
+            else if (!p.second && p.first.second == 150) {
                 p.second = new SpEnemy(GetScreenWidth() / 2 - 15, 0, true);
                 respawns++;
                 break;
@@ -126,29 +134,16 @@ void Program::ManageEnemyRespawns() {
     }
 
     if (count > 0 && delay <= 0) {
-        Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
-            std::pair<float, float>{0, 0}, 
-            new DyEnemy(GetScreenWidth(), 300)
-        });
-        Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {   //This line was done by Jose Rosado
-            std::pair<float, float>{350, 150},  //This line was done by Jose Rosado
-            new SpEnemy(350, 150)   //This line was done by Jose Rosado
-        });//This line was done by Jose Rosado
+        Enemy::enemies.push_back({ {0, 0}, new DyEnemy(GetScreenWidth(), 300) });
+        Enemy::enemies.push_back({ {350, 150}, new SpEnemy(350, 150) });
+        Enemy::enemies.push_back({ {600, 150}, new SpEnemy(600, 150) });
 
-        Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {   //This line was done by Jose Rosado
-            std::pair<float, float>{600, 150},  //This line was done by Jose Rosado
-            new SpEnemy(600, 150)   //This line was done by Jose Rosado
-        }); //This line was done by Jose Rosado
+        for (int i = 0; i < 30; i++) {
+            float x = 250 + 50 * (i % 10);
+            float y = 200 + 50 * (i / 10);
+            Enemy::enemies.push_back({ {x, y}, new StdEnemy(x, y) });
+        }
 
-for (int i = 0; i < 30; i++) {  //This line was done by Jose Rosado
-    float x = 250 + 50 * (i % 10);  //This line was done by Jose Rosado
-    float y = 200 + 50 * (i / 10);  //This line was done by Jose Rosado
-
-    Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {   //This line was done by Jose Rosado
-        std::pair<float, float>{x, y},  //This line was done by Jose Rosado
-        new StdEnemy(x, y)  //This line was done by Jose Rosado
-    }); //This line was done by Jose Rosado
-}   //This line was done by Jose Rosado
         count--;
         delay = 20;
     }
@@ -187,8 +182,8 @@ void Program::KeyInputs() {
         startup = false;
     }
 
-    if (!startup && !paused && !gameOver && pauseFrames <= 0) player->keyInputs();
-   
+    if (!startup && !paused && !gameOver && pauseFrames <= 0)
+        player->keyInputs();
 }
 
 void Program::PlayerReset() {
@@ -204,21 +199,29 @@ void Program::PlayerReset() {
 }
 
 void Program::Reset() {
+    for (auto &p : Enemy::enemies) {
+        delete p.second;
+    }
     Enemy::enemies.clear();
+
     StdEnemy::attackInProgress = false;
+
+    delete player;
     player = new Player((GetScreenWidth() / 2) - 15, GetScreenHeight() * 0.75f);
+
     respawnCooldown = 1080;
     respawns = 0;
     count = 0;
     delay = 0;
     lives = 3;
-Enemy::enemies.push_back({{350, 150}, new SpEnemy(350, 150)});
-Enemy::enemies.push_back({{600, 150}, new SpEnemy(600, 150)});
 
-for (int i = 0; i < 30; i++) {
-    float x = 250 + 50 *(i%10);
-    float y = 200 + 50 * (i/10);
+    Enemy::enemies.push_back({{350, 150}, new SpEnemy(350, 150)});
+    Enemy::enemies.push_back({{600, 150}, new SpEnemy(600, 150)});
 
-    Enemy::enemies.push_back({{x, y}, new StdEnemy(x, y)});
+    for (int i = 0; i < 30; i++) {
+        float x = 250 + 50 *(i%10);
+        float y = 200 + 50 * (i/10);
+        Enemy::enemies.push_back({{x, y}, new StdEnemy(x, y)});
+    }
 }
-}
+    
