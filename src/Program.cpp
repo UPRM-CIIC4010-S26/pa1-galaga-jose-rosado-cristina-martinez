@@ -3,6 +3,10 @@
 #include <utility>
 #include <algorithm>
 
+int score = 0;
+int nextLifeScore = 1000;
+int lives = 3;
+
 struct FloatingText {
     Vector2 position;
     int value;
