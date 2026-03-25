@@ -33,8 +33,12 @@ Program::Program() {
 
 void Program::Update() {
     for (Animation& a : Animation::animations) a.update();
-    for (int i = 0; i < Animation::animations.size(); i++)
-        if (Animation::animations[i].done) Animation::animations.erase(Animation::animations.begin() + i);
+
+    for (int i = Animation::animations.size() - 1; i >= 0; i--) {
+        if (Animation::animations[i].done) {
+            Animation::animations.erase(Animation::animations.begin() + i);
+        }
+    }
 
     pauseFrames = std::max(pauseFrames - 1, 0);
 
@@ -46,7 +50,6 @@ void Program::Update() {
 
         for (auto &p : Enemy::enemies) {
             if (p.second && p.second->health <= 0) {
-
                 int points = 0;
                 if (dynamic_cast<StdEnemy*>(p.second)) points = 100;
                 else if (dynamic_cast<SpEnemy*>(p.second)) points = 200;
@@ -56,9 +59,9 @@ void Program::Update() {
                 score += points;
 
                 floatingTexts.push_back({
-                    Vector2{p.first.first, p.first.second},
+                    Vector2{p.second->position.first, p.second->position.second},
                     points,
-                    60
+                    120
                 });
 
                 delete p.second;
@@ -87,7 +90,7 @@ void Program::Update() {
 
         for (Projectile& p : Projectile::projectiles) { 
             p.update(); 
-            if(p.ID !=0 && HitBox::Collision(player->hitBox,p.getHitBox())){
+            if(p.ID != 0 && HitBox::Collision(player->hitBox, p.getHitBox())){
                 PlayerReset();
             }
         }
@@ -100,7 +103,9 @@ void Program::Update() {
     for (int i = floatingTexts.size() - 1; i >= 0; i--) {
         floatingTexts[i].position.y -= 1.0f;
         floatingTexts[i].frames--;
-        if (floatingTexts[i].frames <= 0) floatingTexts.erase(floatingTexts.begin() + i);
+        if (floatingTexts[i].frames <= 0) {
+            floatingTexts.erase(floatingTexts.begin() + i);
+        }
     }
 }
 
@@ -132,8 +137,10 @@ void Program::Draw() {
 void Program::ManageEnemyRespawns() {
     delay = std::max(delay - 1, 0);
     respawnCooldown -= 1;
+
     if (respawnCooldown <= 0) {
         respawnCooldown = 1080;
+
         for (auto &p : Enemy::enemies) {
             if (!p.second && p.first.second != 150) {
                 int eType = GetRandomValue(1, 3);
@@ -149,7 +156,7 @@ void Program::ManageEnemyRespawns() {
         }
     }
 
-    if(respawns >= 4) {
+    if (respawns >= 4) {
         count = 4;
         respawns = 0;
     }
