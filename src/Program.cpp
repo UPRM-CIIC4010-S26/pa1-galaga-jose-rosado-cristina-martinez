@@ -129,7 +129,7 @@ void Program::Draw() {
         DrawText(TextFormat("+%d", t.value), t.position.x, t.position.y, 20, YELLOW);
     }
 
-    DrawText(TextFormat("Score: %d", score), GetScreenWidth() - 180, 20, 24, WHITE);
+    DrawText(TextFormat("Score: %1", score), GetScreenWidth() - 180, 20, 24, WHITE);
 
     if (startup) DrawStartup();
     if (paused) DrawPauseScreen();
