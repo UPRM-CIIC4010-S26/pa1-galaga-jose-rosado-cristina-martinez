@@ -48,6 +48,15 @@ void Program::Update() {
         ManageEnemyRespawns();
         player->update();
 
+        for (Projectile& p : Projectile::projectiles) { 
+            p.update(); 
+            if(p.ID != 0 && HitBox::Collision(player->hitBox, p.getHitBox())){
+                PlayerReset();
+            }
+        }
+
+        Projectile::ProjectileCollision();
+
         for (auto &p : Enemy::enemies) {
             if (p.second && p.second->health <= 0) {
                 int points = 0;
@@ -88,16 +97,9 @@ void Program::Update() {
             }
         }
 
-        for (Projectile& p : Projectile::projectiles) { 
-            p.update(); 
-            if(p.ID != 0 && HitBox::Collision(player->hitBox, p.getHitBox())){
-                PlayerReset();
-            }
-        }
-
         if (lives <= 0 && pauseFrames <= 0) gameOver = true;
+
         Projectile::CleanProjectiles();
-        Projectile::ProjectileCollision();
     }
 
     for (int i = floatingTexts.size() - 1; i >= 0; i--) {
