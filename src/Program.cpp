@@ -83,7 +83,7 @@ void Program::Update() {
             nextLifeScore += 1000;
         }
 
-        for (auto p : Enemy::enemies) {
+        for (auto &p : Enemy::enemies) {
             if (p.second && HitBox::Collision(player->hitBox, p.second->hitBox)) {
                 Animation::animations.push_back(
                     Animation(player->position.first, player->position.second, 16, 0, 33, 34, 30 ,30, 3, ImageManager::SpriteSheet)
