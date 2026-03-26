@@ -39,6 +39,11 @@ void Program::Update() {
         StdEnemy::attackReset();
         ManageEnemyRespawns();
         player->update();
+    
+    if(score>=lifeupscore && lives<5){
+        lives++;
+        lifeupscore+=1000;
+    }
 
         for (std::pair<std::pair<float, float>, Enemy*> p : Enemy::enemies) {
             if (p.second && HitBox::Collision(player->hitBox, p.second->hitBox)) {
@@ -190,7 +195,8 @@ void Program::Reset() {
     count = 0;
     delay = 0;
     lives = 3;
-    score=0;    //score should reset when the game starts over
+    score=0;  //score should reset when the game starts over
+    lifeupscore=1000;  
 
     Enemy::enemies.push_back(std::pair<std::pair<float, float>, Enemy*> {
             std::pair<float, float>{350, 150}, 

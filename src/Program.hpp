@@ -20,6 +20,7 @@ class Program {
         int lives = 3;
         int pauseFrames = 0;
         int score=0;    // for the scoring system
+        int lifeupscore=1000;
         bool startup = true;
         bool paused = false;
         bool gameOver = false;
