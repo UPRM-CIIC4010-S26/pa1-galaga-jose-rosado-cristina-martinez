@@ -16,6 +16,7 @@ class Enemy {
         
     public:
         int health = 1;
+        int scoreperenemytype;
         std::pair<float, float> position;
         HitBox hitBox;
 
@@ -44,7 +45,7 @@ class Enemy {
              }
         }
 
-        static void ManageEnemies(HitBox target) {
+        static void ManageEnemies(HitBox target,int& score) {
             for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
                 p.first.first += (p.first.first == 0) ? 0 : direction;
                 if (p.second) {
@@ -58,6 +59,12 @@ class Enemy {
                     }
 
                     if (p.second->health <= 0) {
+                        switch(p.second->scoreperenemytype){ //swtich para los puntos por enemigo
+                            case 0: score+=100; break;
+                            case 1: score+=200; break;
+                            case 2: score+=300; break;
+                            case 3: score+=400; break;
+                        }
                         Animation::animations.push_back(
                             Animation(p.second->position.first, p.second->position.second, 155, 0, 33, 33, 30, 30, 4, ImageManager::SpriteSheet)
                         );
