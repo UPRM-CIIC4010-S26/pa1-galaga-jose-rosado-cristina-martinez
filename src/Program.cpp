@@ -95,8 +95,14 @@ void Program::Draw() {
 
 void Program::ManageEnemyRespawns() {
     delay = std::max(delay - 1, 0);
+    int rate=1;
+    if(score>=1000) rate=2;
+    if(score>=5000) rate=5;
+    if(score>=6000) rate=10;
+    if(score>=7000) rate=20;
 
     respawnCooldown -= 1;
+    respawnCooldown-=rate;
     if (respawnCooldown <= 0) {
         respawnCooldown = 1080;
         for (std::pair<std::pair<float, float>, Enemy*>& p : Enemy::enemies) {
