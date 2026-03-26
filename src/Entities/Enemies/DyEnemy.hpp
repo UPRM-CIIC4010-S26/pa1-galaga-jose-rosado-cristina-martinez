@@ -10,10 +10,11 @@ class DyEnemy : public Enemy {
     public:
         DyEnemy(float x, float y) : Enemy(x, y) { 
             this->cooldown = GetRandomValue(90, 300);
-            this->health = 1; 
+            this->health = 1;
+            this->scoreperenemytype=0; //case 0 
         }
 
         void draw() override;
         void update(std::pair<float, float> pos, HitBox target) override;
-        void attack(HitBox target) override;
+        void attack(HitBox target) override; 
 };

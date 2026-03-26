@@ -12,6 +12,7 @@ class SpEnemy : public Enemy {
         SpEnemy(float x, float y) : Enemy(x, y) { 
             this->cooldown = GetRandomValue(300, 1380); 
             this->health = 4;
+            this->scoreperenemytype = 1;    //case 1
         }
 
         SpEnemy(float x, float y, bool newSpawn) : Enemy(x, y){
