@@ -11,8 +11,8 @@ Don't forget that you must also fill out an evaluation form in Moodle to conside
 
 ## Grading
 
-(STUDENT NUMBER HERE) (STUDENT NAME HERE) (STUDENT EMAIL HERE)
-(STUDENT NUMBER HERE) (STUDENT NAME HERE) (STUDENT EMAIL HERE)
+(802-23-2953) (Cristina Martínez Delgado) (cristina.martinez15@upr.edu)
+La profesora me autorizó a entregar el proyecto sola debido a una situación con mi compañero de proyecto.
 
 Any project that doesn't compile will receive a 0.
 
@@ -21,4 +21,4 @@ You MUST put you & your partner's information in this README file otherwise ther
 If a partner has no commits in the repositories, they will receive a 0.
 
 ## Student Notes
-If you have any bonus specs, bonus or any details the TA's should know, you should include it here:
+If you have any bonus specs, bonus or any details the TA's should know, you should include it here: For the bonus I added background music and the option for the spaceship to move up and down.
